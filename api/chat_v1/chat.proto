@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package chat_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/mistandok/chat-server/pkg/chat_v1;chat_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Chat API V1"
+    version: "1.0.0"
+    contact: {
+      name: "Anton Artikov"
+      email: "arti-anton@yandex.ru"
+    };
+  }
+
+  security_definitions: {
+    security: {
+      key: "bearer"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+
+  security: {
+    security_requirement: {
+      key: "bearer"
+    }
+  }
+
+  host: "localhost:8051",
+  schemes: HTTP,
+  schemes: HTTPS,
+  consumes: "application/json",
+  produces: "application/json",
+};
+
+service ChatV1 {
+  // Создает новый чат с указанными пользователями
+  rpc Create(CreateRequest) returns (CreateResponse){
+    option (google.api.http) = {
+      post: "/chat/v1"
+      body: "*"
+    };
+  }
+
+  // Удаляет чат
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/chat/v1"
+    };
+  }
+
+  // Отправляет сообщение от пользователя в указанный чат
+  rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/chat/v1/send-message"
+      body: "*"
+    };
+  }
+
+  // Создает соединение с чатом
+  rpc ConnectChat (ConnectChatRequest) returns (stream Message){
+    option (google.api.http) = {
+      post: "/chat/v1/connect-chat"
+      body: "*"
+    };
+  }
+}
+
+message CreateRequest {
+  // Идентификаторы пользователей в чате
+  repeated int64 userIDs = 1 [(validate.rules).repeated = {unique: true, items: {int64: {gt: 0}}}];
+}
+
+message CreateResponse {
+  // Идентификатор чата
+  int64 id = 1;
+}
+
+message DeleteRequest {
+  // Идентификатор чата
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+}
+
+message SendMessageRequest {
+  // Сообщение
+  Message message = 1;
+  // Идентификатор чата, в который адресовано сообщений
+  int64 toChatId = 2 [(validate.rules).int64.gt = 0];
+}
+
+message Message {
+  // Идентификатор пользователя
+  int64 from_user_id = 1 [(validate.rules).int64.gt = 0];
+  // Имя пользователя
+  string from_user_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Текст сообщения
+  string text = 3 [(validate.rules).string = {min_len: 1, max_len: 2000}];
+  // Время отправки
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message ConnectChatRequest {
+  // Идентификатор чата
+  int64 chat_id = 1;
+  // Идентификатор пользователя
+  int64 user_id = 2;
+  // Имя пользователя
+  string user_name = 3;
+}
