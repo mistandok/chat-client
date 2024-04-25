@@ -177,8 +177,16 @@ func (s *serviceProvider) TokensRepo(_ context.Context) repository.TokensReposit
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat}
-	logger := zerolog.New(output).With().Timestamp().Logger()
+	logFile, err := os.OpenFile(
+		logConfig.LogFilePath,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664,
+	)
+	if err != nil {
+		log.Fatalf("не удалось создать файл для логирования")
+	}
+	logWriter := zerolog.MultiLevelWriter(logFile)
+	logger := zerolog.New(logWriter).With().Timestamp().Logger()
 	logger = logger.Level(logConfig.LogLevel)
 	zerolog.TimeFieldFormat = logConfig.TimeFormat
 

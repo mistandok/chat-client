@@ -14,6 +14,7 @@ import (
 const (
 	logLevel      = "LOG_LEVEL"
 	logTimeFormat = "LOG_TIME_FORMAT"
+	logFilePath   = "LOG_FILE_PATH"
 )
 
 // LogCfgSearcher logger config searcher.
@@ -41,8 +42,14 @@ func (s *LogCfgSearcher) Get() (*config.LogConfig, error) {
 		return nil, errors.New("не найден формат времени логирования")
 	}
 
+	logPath := os.Getenv(logFilePath)
+	if len(logPath) == 0 {
+		return nil, errors.New("не задан файл логирования")
+	}
+
 	return &config.LogConfig{
-		LogLevel:   zerolog.Level(logLevelInt),
-		TimeFormat: timeFormat,
+		LogLevel:    zerolog.Level(logLevelInt),
+		TimeFormat:  timeFormat,
+		LogFilePath: logPath,
 	}, nil
 }

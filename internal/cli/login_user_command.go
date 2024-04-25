@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"github.com/mistandok/chat-client/internal/client"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,7 @@ func (c *Chat) createLoginUserCmd() *cobra.Command {
 				}
 			}
 
+			fmt.Println("pu pu pu")
 			c.logger.Info().Msg("вы успешно залогинились")
 		},
 	}
