@@ -185,7 +185,8 @@ func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
 	if err != nil {
 		log.Fatalf("не удалось создать файл для логирования")
 	}
-	logWriter := zerolog.MultiLevelWriter(logFile)
+	consoleOutput := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat}
+	logWriter := zerolog.MultiLevelWriter(logFile, consoleOutput)
 	logger := zerolog.New(logWriter).With().Timestamp().Logger()
 	logger = logger.Level(logConfig.LogLevel)
 	zerolog.TimeFieldFormat = logConfig.TimeFormat
