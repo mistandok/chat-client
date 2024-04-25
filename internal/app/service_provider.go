@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"github.com/mistandok/chat-client/internal/repository"
+	"github.com/mistandok/chat-client/internal/repository/token"
 	"log"
 	"os"
 
@@ -31,6 +33,8 @@ type serviceProvider struct {
 
 	authClient client.AuthClient
 	userClient client.UserClient
+
+	tokensRepo repository.TokensRepository
 
 	chatService service.ChatService
 
@@ -158,10 +162,18 @@ func (s *serviceProvider) UserClient(ctx context.Context) client.UserClient {
 
 func (s *serviceProvider) ChatService(ctx context.Context) service.ChatService {
 	if s.chatService == nil {
-		s.chatService = chat.NewService(s.UserClient(ctx))
+		s.chatService = chat.NewService(s.Logger(), s.UserClient(ctx), s.AuthClient(ctx), s.TokensRepo(ctx))
 	}
 
 	return s.chatService
+}
+
+func (s *serviceProvider) TokensRepo(_ context.Context) repository.TokensRepository {
+	if s.tokensRepo == nil {
+		s.tokensRepo = token.NewRepo("/tmp/user_tokens")
+	}
+
+	return s.tokensRepo
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
