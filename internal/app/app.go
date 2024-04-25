@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	"github.com/mistandok/chat-client/pkg/auth_v1"
 
+	"github.com/mistandok/chat-client/internal/cli"
 	"github.com/mistandok/chat-client/internal/config"
 	"github.com/mistandok/platform_common/pkg/closer"
 )
@@ -12,6 +12,7 @@ import (
 type App struct {
 	serviceProvider *serviceProvider
 	configPath      string
+	cliChat         *cli.Chat
 }
 
 // NewApp ..
@@ -26,26 +27,16 @@ func NewApp(ctx context.Context, configPath string) (*App, error) {
 }
 
 // Run ..
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
 	}()
 
-	logger := a.serviceProvider.Logger()
-	logger.Info().Msg(a.serviceProvider.AuthConfig().Address())
-	logger.Info().Msg(a.serviceProvider.ChatConfig().Address())
-	client := a.serviceProvider.AuthV1Client(context.TODO())
-	_, err := client.Login(context.TODO(), &auth_v1.LoginRequest{
-		Email:    "anton",
-		Password: "anton@mail.ru",
-	})
+	err := a.cliChat.Execute(ctx)
 	if err != nil {
-		logger.Err(err).Msg("error")
+		return err
 	}
-
-	a.serviceProvider.ChatV1Client(context.TODO())
-	a.serviceProvider.UserV1Client(context.TODO())
 
 	return nil
 }
@@ -54,6 +45,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	initDepFunctions := []func(context.Context) error{
 		a.initConfig,
 		a.initServiceProvider,
+		a.initCliChat,
 	}
 
 	for _, f := range initDepFunctions {
@@ -76,5 +68,10 @@ func (a *App) initConfig(_ context.Context) error {
 
 func (a *App) initServiceProvider(_ context.Context) error {
 	a.serviceProvider = newServiceProvider()
+	return nil
+}
+
+func (a *App) initCliChat(ctx context.Context) error {
+	a.cliChat = cli.NewChat(a.serviceProvider.Logger(), a.serviceProvider.ChatService(ctx))
 	return nil
 }

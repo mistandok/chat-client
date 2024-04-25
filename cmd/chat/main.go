@@ -23,7 +23,7 @@ func main() {
 		log.Fatalf("ошибка при инициализации приложения: %s", err.Error())
 	}
 
-	if err := application.Run(); err != nil {
+	if err = application.Run(ctx); err != nil {
 		log.Fatalf("ошибка во время работы приложения: %s", err.Error())
 	}
 }

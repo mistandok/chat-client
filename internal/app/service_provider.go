@@ -2,13 +2,19 @@ package app
 
 import (
 	"context"
+	"log"
+	"os"
+
+	"github.com/mistandok/chat-client/internal/client"
+	"github.com/mistandok/chat-client/internal/client/auth"
+	"github.com/mistandok/chat-client/internal/client/user"
+	"github.com/mistandok/chat-client/internal/service"
+	"github.com/mistandok/chat-client/internal/service/chat"
 	"github.com/mistandok/chat-client/pkg/auth_v1"
 	"github.com/mistandok/chat-client/pkg/chat_v1"
 	"github.com/mistandok/chat-client/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
-	"os"
 
 	"github.com/mistandok/chat-client/internal/config"
 	"github.com/mistandok/chat-client/internal/config/env"
@@ -19,9 +25,14 @@ type serviceProvider struct {
 	authConfig *config.GRPCConfig
 	chatConfig *config.GRPCConfig
 
-	authClient auth_v1.AuthV1Client
-	userClient user_v1.UserV1Client
-	chatClient chat_v1.ChatV1Client
+	authGRPCClient auth_v1.AuthV1Client
+	userGRPCClient user_v1.UserV1Client
+	chatGRPCClient chat_v1.ChatV1Client
+
+	authClient client.AuthClient
+	userClient client.UserClient
+
+	chatService service.ChatService
 
 	logger *zerolog.Logger
 }
@@ -77,7 +88,7 @@ func (s *serviceProvider) Logger() *zerolog.Logger {
 
 // AuthV1Client ..
 func (s *serviceProvider) AuthV1Client(_ context.Context) auth_v1.AuthV1Client {
-	if s.authClient == nil {
+	if s.authGRPCClient == nil {
 		cfg := s.AuthConfig()
 		conn, err := grpc.Dial(
 			cfg.Address(),
@@ -87,15 +98,15 @@ func (s *serviceProvider) AuthV1Client(_ context.Context) auth_v1.AuthV1Client {
 			log.Fatalf("ошибка при установлении соединения с auth-сервисом: %v", err)
 		}
 
-		s.authClient = auth_v1.NewAuthV1Client(conn)
+		s.authGRPCClient = auth_v1.NewAuthV1Client(conn)
 	}
 
-	return s.authClient
+	return s.authGRPCClient
 }
 
 // UserV1Client ..
 func (s *serviceProvider) UserV1Client(_ context.Context) user_v1.UserV1Client {
-	if s.userClient == nil {
+	if s.userGRPCClient == nil {
 		cfg := s.AuthConfig()
 		conn, err := grpc.Dial(
 			cfg.Address(),
@@ -105,15 +116,15 @@ func (s *serviceProvider) UserV1Client(_ context.Context) user_v1.UserV1Client {
 			log.Fatalf("ошибка при установлении соединения с auth-сервисом: %v", err)
 		}
 
-		s.userClient = user_v1.NewUserV1Client(conn)
+		s.userGRPCClient = user_v1.NewUserV1Client(conn)
 	}
 
-	return s.userClient
+	return s.userGRPCClient
 }
 
 // ChatV1Client ..
 func (s *serviceProvider) ChatV1Client(_ context.Context) chat_v1.ChatV1Client {
-	if s.chatClient == nil {
+	if s.chatGRPCClient == nil {
 		cfg := s.ChatConfig()
 		conn, err := grpc.Dial(
 			cfg.Address(),
@@ -123,10 +134,34 @@ func (s *serviceProvider) ChatV1Client(_ context.Context) chat_v1.ChatV1Client {
 			log.Fatalf("ошибка при установлении соединения с chat-сервисом: %v", err)
 		}
 
-		s.chatClient = chat_v1.NewChatV1Client(conn)
+		s.chatGRPCClient = chat_v1.NewChatV1Client(conn)
 	}
 
-	return s.chatClient
+	return s.chatGRPCClient
+}
+
+func (s *serviceProvider) AuthClient(ctx context.Context) client.AuthClient {
+	if s.authClient == nil {
+		s.authClient = auth.NewClient(s.Logger(), s.AuthV1Client(ctx))
+	}
+
+	return s.authClient
+}
+
+func (s *serviceProvider) UserClient(ctx context.Context) client.UserClient {
+	if s.userClient == nil {
+		s.userClient = user.NewClient(s.Logger(), s.UserV1Client(ctx))
+	}
+
+	return s.userClient
+}
+
+func (s *serviceProvider) ChatService(ctx context.Context) service.ChatService {
+	if s.chatService == nil {
+		s.chatService = chat.NewService(s.UserClient(ctx))
+	}
+
+	return s.chatService
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {

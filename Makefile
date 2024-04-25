@@ -117,5 +117,11 @@ vendor-proto:
 local-start-client:
 	go run cmd/chat/main.go -config=deploy/env/.env.local
 
+local-start-cli:
+	go run cmd/chat/main.go
+
 prod-start-client:
 	go run cmd/chat/main.go -config=deploy/env/.env.prod
+
+build-cli-app:
+	GOBIN=$(LOCAL_BIN) go build -o $(LOCAL_BIN)/cli-chat ./cmd/chat/main.go
