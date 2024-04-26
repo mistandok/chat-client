@@ -16,3 +16,13 @@ type AuthClient interface {
 type UserClient interface {
 	Create(ctx context.Context, userForCreate model.UserForCreate) error
 }
+
+type ChatClient interface {
+	ConnectChat(ctx context.Context, connectChatIn model.ConnectChatIn) (StreamReader, error)
+}
+
+// StreamReader ..
+type StreamReader interface {
+	Recv() (*model.Message, error)
+	Context() context.Context
+}

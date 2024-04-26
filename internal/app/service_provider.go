@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	chatClient "github.com/mistandok/chat-client/internal/client/chat"
 	"io"
 	"log"
 	"os"
@@ -35,6 +36,7 @@ type serviceProvider struct {
 
 	authClient client.AuthClient
 	userClient client.UserClient
+	chatClient client.ChatClient
 
 	tokensRepo repository.TokensRepository
 
@@ -162,9 +164,23 @@ func (s *serviceProvider) UserClient(ctx context.Context) client.UserClient {
 	return s.userClient
 }
 
+func (s *serviceProvider) ChatClient(ctx context.Context) client.ChatClient {
+	if s.chatClient == nil {
+		s.chatClient = chatClient.NewClient(s.Logger(), s.ChatV1Client(ctx))
+	}
+
+	return s.chatClient
+}
+
 func (s *serviceProvider) ChatService(ctx context.Context) service.ChatService {
 	if s.chatService == nil {
-		s.chatService = chat.NewService(s.Logger(), s.UserClient(ctx), s.AuthClient(ctx), s.TokensRepo(ctx))
+		s.chatService = chat.NewService(
+			s.Logger(),
+			s.UserClient(ctx),
+			s.AuthClient(ctx),
+			s.ChatClient(ctx),
+			s.TokensRepo(ctx),
+		)
 	}
 
 	return s.chatService
@@ -188,10 +204,10 @@ func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
 	logFile, err := os.OpenFile(
 		logConfig.LogFilePath,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		os.ModeAppend,
+		0664,
 	)
 	if err != nil {
-		log.Fatalf("не удалось создать файл для логирования")
+		log.Fatalf("не удалось создать файл для логирования: %v", err)
 	}
 	writers = append(writers, logFile)
 	logWriter := zerolog.MultiLevelWriter(writers...)
