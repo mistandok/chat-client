@@ -1,9 +1,7 @@
 package cli
 
 import (
-	"errors"
-	"fmt"
-	"github.com/mistandok/chat-client/internal/client"
+	"github.com/mistandok/chat-client/internal/functional_error"
 	"github.com/spf13/cobra"
 )
 
@@ -23,14 +21,15 @@ func (c *Chat) createLoginUserCmd() *cobra.Command {
 
 			err = c.chatService.LoginUser(cmd.Context(), email, password)
 			if err != nil {
-				if errors.Is(err, client.ErrUserNotFound) || errors.Is(err, client.ErrIncorrectAuthData) {
-					c.logger.Warn().Msg(err.Error())
-					return
+				if functional_error.IsFunctionalError(err) {
+					Warning(err.Error())
 				}
+				c.logger.Err(err).Msg(err.Error())
+
+				return
 			}
 
-			fmt.Println("pu pu pu")
-			c.logger.Info().Msg("вы успешно залогинились")
+			Info("авторизация успешно завершена")
 		},
 	}
 }

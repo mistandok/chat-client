@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+
 	"github.com/mistandok/chat-client/internal/service"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ const (
 	loginUserDesc  = "осуществляет log-in пользователя"
 )
 
+// Chat ..
 type Chat struct {
 	chatService service.ChatService
 	logger      *zerolog.Logger
@@ -28,6 +30,7 @@ type Chat struct {
 	loginUserCmd  *cobra.Command
 }
 
+// NewChat ..
 func NewChat(logger *zerolog.Logger, chatService service.ChatService) *Chat {
 	chat := &Chat{chatService: chatService, logger: logger}
 	chat.initCommands()
@@ -36,6 +39,7 @@ func NewChat(logger *zerolog.Logger, chatService service.ChatService) *Chat {
 	return chat
 }
 
+// Execute ..
 func (c *Chat) Execute(ctx context.Context) error {
 	err := c.rootCmd.ExecuteContext(ctx)
 	if err != nil {

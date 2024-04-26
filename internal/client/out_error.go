@@ -6,12 +6,12 @@ const (
 	errMsgUserNotFound      = "пользователь с такими данными не найден"
 	errMsgUserAlreadyExists = "пользователь уже существует"
 	errMsgIncorrectAuthData = "некорректные авторизационные данные"
-	errMsgTooLongPass       = "слишком длинный пароль"
+	errMsgTooLongP          = "слишком длинный пароль"
 )
 
 var (
-	ErrUserNotFound      = errors.New(errMsgUserNotFound)
-	ErrUserAlreadyExists = errors.New(errMsgUserAlreadyExists)
-	ErrIncorrectAuthData = errors.New(errMsgIncorrectAuthData)
-	ErrTooLongPass       = errors.New(errMsgTooLongPass)
+	ErrUserNotFound      = errors.New(errMsgUserNotFound)      // ErrUserNotFound ..
+	ErrUserAlreadyExists = errors.New(errMsgUserAlreadyExists) // ErrUserAlreadyExists ..
+	ErrIncorrectAuthData = errors.New(errMsgIncorrectAuthData) // ErrIncorrectAuthData ..
+	ErrTooLongPass       = errors.New(errMsgTooLongP)          // ErrTooLongPass ..
 )

@@ -6,6 +6,7 @@ import (
 	"github.com/mistandok/chat-client/internal/model"
 )
 
+// ChatService ..
 type ChatService interface {
 	CreateUser(ctx context.Context, userForCreate model.UserForCreate) error
 	LoginUser(ctx context.Context, email string, password string) error

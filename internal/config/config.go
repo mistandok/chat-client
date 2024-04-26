@@ -45,7 +45,8 @@ func (cfg *GRPCConfig) Address() string {
 
 // LogConfig config for zerolog.
 type LogConfig struct {
-	LogLevel    zerolog.Level
-	LogFilePath string
-	TimeFormat  string
+	LogLevel     zerolog.Level
+	LogFilePath  string
+	TimeFormat   string
+	LogInConsole bool
 }

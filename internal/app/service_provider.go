@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
-	"github.com/mistandok/chat-client/internal/repository"
-	"github.com/mistandok/chat-client/internal/repository/token"
+	"io"
 	"log"
 	"os"
+
+	"github.com/mistandok/chat-client/internal/repository"
+	"github.com/mistandok/chat-client/internal/repository/token"
 
 	"github.com/mistandok/chat-client/internal/client"
 	"github.com/mistandok/chat-client/internal/client/auth"
@@ -177,16 +179,22 @@ func (s *serviceProvider) TokensRepo(_ context.Context) repository.TokensReposit
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
+	writers := make([]io.Writer, 0, 2)
+
+	if logConfig.LogInConsole {
+		writers = append(writers, zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat})
+	}
+
 	logFile, err := os.OpenFile(
 		logConfig.LogFilePath,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0664,
+		os.ModeAppend,
 	)
 	if err != nil {
 		log.Fatalf("не удалось создать файл для логирования")
 	}
-	consoleOutput := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat}
-	logWriter := zerolog.MultiLevelWriter(logFile, consoleOutput)
+	writers = append(writers, logFile)
+	logWriter := zerolog.MultiLevelWriter(writers...)
 	logger := zerolog.New(logWriter).With().Timestamp().Logger()
 	logger = logger.Level(logConfig.LogLevel)
 	zerolog.TimeFieldFormat = logConfig.TimeFormat

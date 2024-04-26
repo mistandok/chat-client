@@ -3,19 +3,23 @@ package token
 import (
 	"context"
 	"encoding/json"
+	"os"
+
 	"github.com/mistandok/chat-client/internal/model"
 	repoModel "github.com/mistandok/chat-client/internal/repository/token/model"
-	"os"
 )
 
+// Repo ..
 type Repo struct {
 	filePath string
 }
 
+// NewRepo ..
 func NewRepo(filePath string) *Repo {
 	return &Repo{filePath: filePath}
 }
 
+// Save ..
 func (r *Repo) Save(_ context.Context, tokens *model.Tokens) (err error) {
 	repoTokens := &repoModel.Tokens{
 		AccessToken:  tokens.AccessToken,
@@ -40,6 +44,7 @@ func (r *Repo) Save(_ context.Context, tokens *model.Tokens) (err error) {
 	return nil
 }
 
+// Get ..
 func (r *Repo) Get(_ context.Context) (tokens *model.Tokens, err error) {
 	repoTokens := &repoModel.Tokens{}
 

@@ -11,11 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Client ..
 type Client struct {
 	logger *zerolog.Logger
 	client user_v1.UserV1Client
 }
 
+// NewClient ..
 func NewClient(logger *zerolog.Logger, client user_v1.UserV1Client) *Client {
 	return &Client{
 		logger: logger,
@@ -23,6 +25,7 @@ func NewClient(logger *zerolog.Logger, client user_v1.UserV1Client) *Client {
 	}
 }
 
+// Create ..
 func (c *Client) Create(ctx context.Context, userForCreate model.UserForCreate) error {
 	_, err := c.client.Create(ctx, &user_v1.CreateRequest{
 		Name:            userForCreate.Name,
@@ -37,7 +40,7 @@ func (c *Client) Create(ctx context.Context, userForCreate model.UserForCreate) 
 			case codes.AlreadyExists:
 				return client.ErrUserAlreadyExists
 			case codes.InvalidArgument:
-				return client.ErrIncorrectAuthData
+				return client.ErrTooLongPass
 			}
 		}
 		c.logger.Err(err).Msg("user rpc error")

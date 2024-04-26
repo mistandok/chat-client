@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/mistandok/chat-client/internal/config"
 
@@ -15,6 +16,7 @@ const (
 	logLevel      = "LOG_LEVEL"
 	logTimeFormat = "LOG_TIME_FORMAT"
 	logFilePath   = "LOG_FILE_PATH"
+	logInConsole  = "LOG_IN_CONSOLE"
 )
 
 // LogCfgSearcher logger config searcher.
@@ -47,9 +49,22 @@ func (s *LogCfgSearcher) Get() (*config.LogConfig, error) {
 		return nil, errors.New("не задан файл логирования")
 	}
 
+	logConsole := os.Getenv(logInConsole)
+	if len(logConsole) == 0 {
+		return nil, errors.New("не задана настройка логирования в консоль")
+	}
+
+	var logInConsoleBool bool
+	if strings.ToLower(logConsole) != "true" {
+		logInConsoleBool = false
+	} else {
+		logInConsoleBool = true
+	}
+
 	return &config.LogConfig{
-		LogLevel:    zerolog.Level(logLevelInt),
-		TimeFormat:  timeFormat,
-		LogFilePath: logPath,
+		LogLevel:     zerolog.Level(logLevelInt),
+		TimeFormat:   timeFormat,
+		LogFilePath:  logPath,
+		LogInConsole: logInConsoleBool,
 	}, nil
 }

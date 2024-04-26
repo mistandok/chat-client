@@ -33,12 +33,7 @@ func (a *App) Run(ctx context.Context) error {
 		closer.Wait()
 	}()
 
-	err := a.cliChat.Execute(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return a.cliChat.Execute(ctx)
 }
 
 func (a *App) initDeps(ctx context.Context) error {

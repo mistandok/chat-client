@@ -11,11 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Client ..
 type Client struct {
 	logger *zerolog.Logger
 	client auth_v1.AuthV1Client
 }
 
+// NewClient ..
 func NewClient(logger *zerolog.Logger, client auth_v1.AuthV1Client) *Client {
 	return &Client{
 		logger: logger,
@@ -23,6 +25,7 @@ func NewClient(logger *zerolog.Logger, client auth_v1.AuthV1Client) *Client {
 	}
 }
 
+// Login ..
 func (c *Client) Login(ctx context.Context, email string, password string) (*model.Tokens, error) {
 	resp, err := c.client.Login(ctx, &auth_v1.LoginRequest{
 		Email:    email,
@@ -47,6 +50,7 @@ func (c *Client) Login(ctx context.Context, email string, password string) (*mod
 	}, nil
 }
 
+// RefreshTokens ..
 func (c *Client) RefreshTokens(ctx context.Context, refreshToken string) (*model.Tokens, error) {
 	resp, err := c.client.RefreshTokens(ctx, &auth_v1.RefreshTokensRequest{RefreshToken: refreshToken})
 	if err != nil {
