@@ -3,6 +3,8 @@ package token
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"github.com/mistandok/chat-client/internal/repository"
 	"os"
 
 	"github.com/mistandok/chat-client/internal/model"
@@ -50,6 +52,9 @@ func (r *Repo) Get(_ context.Context) (tokens *model.Tokens, err error) {
 
 	file, err := os.Open(r.filePath)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, repository.ErrTokensNotFound
+		}
 		return nil, err
 	}
 

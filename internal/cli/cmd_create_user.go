@@ -1,7 +1,8 @@
 package cli
 
 import (
-	"github.com/mistandok/chat-client/internal/functional_error"
+	"github.com/mistandok/chat-client/internal/cli/console"
+	"github.com/mistandok/chat-client/internal/common_error"
 	"github.com/mistandok/chat-client/internal/model"
 	"github.com/spf13/cobra"
 )
@@ -30,15 +31,15 @@ func (c *Chat) createCreateUserCmd() *cobra.Command {
 				Password: password,
 			})
 			if err != nil {
-				if functional_error.IsFunctionalError(err) {
-					Warning(err.Error())
+				if common_error.IsCommonError(err) {
+					console.Warning(err.Error())
 				}
 				c.logger.Err(err).Msg(err.Error())
 
 				return
 			}
 
-			Info("пользователь успешно создан")
+			console.Info("пользователь успешно создан")
 		},
 	}
 }

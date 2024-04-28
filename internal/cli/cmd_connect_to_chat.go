@@ -3,12 +3,12 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/mistandok/chat-client/internal/cli/console"
+	"github.com/mistandok/chat-client/internal/common_error"
 	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -24,14 +24,16 @@ func (c *Chat) createConnectToChatCmd() *cobra.Command {
 
 			stream, err := c.chatService.ConnectChat(cmd.Context(), chatID)
 			if err != nil {
-				c.logger.Fatal().Msg(err.Error())
+				if common_error.IsCommonError(err) {
+					console.Warning(err.Error())
+				}
+				c.logger.Err(err).Msg("неудачное подключение к чату")
 
 				return
 			}
 
 			go func() {
 				for {
-					c.logger.Info().Msg("try get message")
 					message, errRecv := stream.Recv()
 					if errRecv == io.EOF {
 						return
@@ -41,27 +43,22 @@ func (c *Chat) createConnectToChatCmd() *cobra.Command {
 						return
 					}
 
-					log.Printf("[%v] - [from: %s]: %s\n",
-						color.YellowString(message.CreatedAt.Format(time.RFC3339)),
-						color.BlueString(message.FromUserName),
-						message.Text,
-					)
-					c.logger.Info().Msg(message.Text)
+					console.OutMessage(message.CreatedAt, message.FromUserName, message.Text)
 				}
 			}()
 
 			scanner := bufio.NewScanner(os.Stdin)
-			var lines strings.Builder
 
 			for {
-				scanner.Scan()
-				line := scanner.Text()
-				if len(line) == 0 {
+				msg, err := console.ScanMessageAndCleanConsoleLine(scanner)
+				if err != nil {
+					console.Info("выход из чата")
 					break
 				}
 
-				lines.WriteString(line)
-				lines.WriteString("\n")
+				if err = c.chatService.SendMessage(cmd.Context(), chatID, msg, time.Now()); err != nil {
+					console.Error("не удалось отправить сообщение, работаем над решением проблемы")
+				}
 			}
 
 			err = scanner.Err()
