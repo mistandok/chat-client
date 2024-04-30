@@ -125,3 +125,6 @@ prod-start-client:
 
 build-cli-app:
 	GOBIN=$(LOCAL_BIN) go build -o $(LOCAL_BIN)/cli-chat ./cmd/chat/main.go
+
+build-cli-app-1:
+	GOBIN=$(LOCAL_BIN) go build -o $(LOCAL_BIN)/cli-chat-1 ./cmd/chat/main.go

@@ -2,9 +2,10 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
-	"github.com/mistandok/chat-client/internal/cli/console"
 	"github.com/mistandok/chat-client/internal/common_error"
+	"github.com/mistandok/chat-client/internal/service"
 	"github.com/spf13/cobra"
 	"io"
 	"log"
@@ -25,46 +26,56 @@ func (c *Chat) createConnectToChatCmd() *cobra.Command {
 			stream, err := c.chatService.ConnectChat(cmd.Context(), chatID)
 			if err != nil {
 				if common_error.IsCommonError(err) {
-					console.Warning(err.Error())
+					c.writer.Warning(err.Error())
 				}
 				c.logger.Err(err).Msg("неудачное подключение к чату")
 
 				return
 			}
+			c.writer.Info("успешное подключение к чату")
 
 			go func() {
-				for {
-					message, errRecv := stream.Recv()
-					if errRecv == io.EOF {
-						return
-					}
-					if errRecv != nil {
-						log.Println("failed to receive message from stream: ", errRecv)
-						return
-					}
-
-					console.OutMessage(message.CreatedAt, message.FromUserName, message.Text)
-				}
+				c.processIncomingMessageFromStream(stream)
 			}()
 
-			scanner := bufio.NewScanner(os.Stdin)
-
-			for {
-				msg, err := console.ScanMessageAndCleanConsoleLine(scanner)
-				if err != nil {
-					console.Info("выход из чата")
-					break
-				}
-
-				if err = c.chatService.SendMessage(cmd.Context(), chatID, msg, time.Now()); err != nil {
-					console.Error("не удалось отправить сообщение, работаем над решением проблемы")
-				}
-			}
-
-			err = scanner.Err()
-			if err != nil {
-				log.Println("failed to scan message: ", err)
-			}
+			c.processOutgoingMessageToClient(cmd.Context(), chatID)
 		},
+	}
+}
+
+func (c *Chat) processIncomingMessageFromStream(stream service.StreamReader) {
+	for {
+		message, errRecv := stream.Recv()
+		if errRecv == io.EOF {
+			return
+		}
+		if errRecv != nil {
+			log.Println("ошибка во время считывания сообщений из stream: ", errRecv)
+			return
+		}
+
+		c.writer.Message(message.CreatedAt, message.FromUserName, message.Text)
+	}
+}
+
+func (c *Chat) processOutgoingMessageToClient(ctx context.Context, chatID int64) {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		msg, err := c.writer.ScanMessage()
+		if err != nil {
+			c.writer.Info("выход из чата")
+			break
+		}
+		c.writer.CleanPreviousLine()
+
+		if err = c.chatService.SendMessage(ctx, chatID, msg, time.Now()); err != nil {
+			c.writer.Error("не удалось отправить сообщение, работаем над решением проблемы")
+		}
+	}
+
+	err := scanner.Err()
+	if err != nil {
+		log.Println("failed to scan message: ", err)
 	}
 }

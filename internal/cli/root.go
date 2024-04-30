@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-
 	"github.com/mistandok/chat-client/internal/service"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
@@ -31,11 +30,13 @@ type Chat struct {
 	createUserCmd    *cobra.Command
 	loginUserCmd     *cobra.Command
 	connectToChatCmd *cobra.Command
+
+	writer ExternalWriter
 }
 
 // NewChat ..
-func NewChat(logger *zerolog.Logger, chatService service.ChatService) *Chat {
-	chat := &Chat{chatService: chatService, logger: logger}
+func NewChat(logger *zerolog.Logger, chatService service.ChatService, writer ExternalWriter) *Chat {
+	chat := &Chat{chatService: chatService, logger: logger, writer: writer}
 	chat.initCommands()
 	chat.combineCommand()
 

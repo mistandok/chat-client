@@ -67,6 +67,11 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initCliChat(ctx context.Context) error {
-	a.cliChat = cli.NewChat(a.serviceProvider.Logger(), a.serviceProvider.ChatService(ctx))
+	a.cliChat = cli.NewChat(
+		a.serviceProvider.Logger(),
+		a.serviceProvider.ChatService(ctx),
+		a.serviceProvider.ConsoleWriter(ctx),
+	)
+
 	return nil
 }

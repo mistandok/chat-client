@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/mistandok/chat-client/internal/cli/console"
 	chatClient "github.com/mistandok/chat-client/internal/client/chat"
 	"io"
 	"log"
@@ -41,6 +42,8 @@ type serviceProvider struct {
 	tokensRepo repository.TokensRepository
 
 	chatService service.ChatService
+
+	consoleWriter *console.ConsoleWriter
 
 	logger *zerolog.Logger
 }
@@ -192,6 +195,14 @@ func (s *serviceProvider) TokensRepo(_ context.Context) repository.TokensReposit
 	}
 
 	return s.tokensRepo
+}
+
+func (s *serviceProvider) ConsoleWriter(_ context.Context) *console.ConsoleWriter {
+	if s.consoleWriter == nil {
+		s.consoleWriter = console.NewConsoleWriter()
+	}
+
+	return s.consoleWriter
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
