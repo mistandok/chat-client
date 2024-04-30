@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/mistandok/chat-client/internal/model"
 	"github.com/mistandok/chat-client/pkg/chat_v1"
 )
@@ -11,6 +12,7 @@ type StreamChatReader struct {
 	stream chat_v1.ChatV1_ConnectChatClient
 }
 
+// NewStreamChatReader ..
 func NewStreamChatReader(stream chat_v1.ChatV1_ConnectChatClient) *StreamChatReader {
 	return &StreamChatReader{stream: stream}
 }
@@ -23,7 +25,7 @@ func (s *StreamChatReader) Recv() (*model.Message, error) {
 	}
 
 	return &model.Message{
-		FromUserId:   message.FromUserId,
+		FromUserID:   message.FromUserId,
 		FromUserName: message.FromUserName,
 		Text:         message.Text,
 		CreatedAt:    message.CreatedAt.AsTime(),

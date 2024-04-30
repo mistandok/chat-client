@@ -2,10 +2,12 @@ package chat
 
 import (
 	"context"
-	tokenUtils "github.com/mistandok/chat-client/internal/utils/token"
 	"strconv"
+
+	tokenUtils "github.com/mistandok/chat-client/internal/utils/token"
 )
 
+// CreateChat ..
 func (s *Service) CreateChat(ctx context.Context) (int64, error) {
 	s.logger.Info().Msg("попытка создать чат")
 

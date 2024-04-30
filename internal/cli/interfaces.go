@@ -2,6 +2,7 @@ package cli
 
 import "time"
 
+// ExternalWriter ..
 type ExternalWriter interface {
 	Info(msg string)
 	Warning(msg string)

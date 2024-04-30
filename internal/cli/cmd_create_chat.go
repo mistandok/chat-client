@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/mistandok/chat-client/internal/common_error"
 	"github.com/spf13/cobra"
 )

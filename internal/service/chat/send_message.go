@@ -2,10 +2,11 @@ package chat
 
 import (
 	"context"
-	"github.com/mistandok/chat-client/internal/model"
-	tokenUtils "github.com/mistandok/chat-client/internal/utils/token"
 	"strconv"
 	"time"
+
+	"github.com/mistandok/chat-client/internal/model"
+	tokenUtils "github.com/mistandok/chat-client/internal/utils/token"
 )
 
 // SendMessage ..
@@ -24,7 +25,7 @@ func (s *Service) SendMessage(ctx context.Context, chatID int64, text string, me
 	}
 
 	if err = s.chatClient.SendMessage(ctx, chatID, model.Message{
-		FromUserId:   userID,
+		FromUserID:   userID,
 		FromUserName: userClaims.UserName,
 		Text:         text,
 		CreatedAt:    messageTime,

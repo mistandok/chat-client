@@ -2,8 +2,9 @@ package model
 
 import "time"
 
+// Message ..
 type Message struct {
-	FromUserId   int64
+	FromUserID   int64
 	FromUserName string
 	Text         string
 	CreatedAt    time.Time

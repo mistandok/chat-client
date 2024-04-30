@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"github.com/mistandok/chat-client/internal/model"
 	"time"
+
+	"github.com/mistandok/chat-client/internal/model"
 )
 
 // ChatService ..

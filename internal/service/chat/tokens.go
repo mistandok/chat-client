@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"errors"
+
 	"github.com/mistandok/chat-client/internal/common_error"
 	"github.com/mistandok/chat-client/internal/model"
 	"github.com/mistandok/chat-client/internal/repository"

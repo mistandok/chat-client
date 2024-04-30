@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/mistandok/chat-client/internal/common_error"
-	"github.com/mistandok/chat-client/internal/service"
-	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"os"
 	"time"
+
+	"github.com/mistandok/chat-client/internal/common_error"
+	"github.com/mistandok/chat-client/internal/service"
+	"github.com/spf13/cobra"
 )
 
 func (c *Chat) createConnectToChatCmd() *cobra.Command {

@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
-	"github.com/mistandok/chat-client/internal/cli/console"
-	chatClient "github.com/mistandok/chat-client/internal/client/chat"
 	"io"
 	"log"
 	"os"
+
+	"github.com/mistandok/chat-client/internal/cli/console"
+	chatClient "github.com/mistandok/chat-client/internal/client/chat"
 
 	"github.com/mistandok/chat-client/internal/repository"
 	"github.com/mistandok/chat-client/internal/repository/token"
@@ -43,7 +44,7 @@ type serviceProvider struct {
 
 	chatService service.ChatService
 
-	consoleWriter *console.ConsoleWriter
+	consoleWriter *console.Writer
 
 	logger *zerolog.Logger
 }
@@ -191,13 +192,13 @@ func (s *serviceProvider) ChatService(ctx context.Context) service.ChatService {
 
 func (s *serviceProvider) TokensRepo(_ context.Context) repository.TokensRepository {
 	if s.tokensRepo == nil {
-		s.tokensRepo = token.NewRepo("/tmp/user_tokens")
+		s.tokensRepo = token.NewRepo("/tmp/user_tokens_1")
 	}
 
 	return s.tokensRepo
 }
 
-func (s *serviceProvider) ConsoleWriter(_ context.Context) *console.ConsoleWriter {
+func (s *serviceProvider) ConsoleWriter(_ context.Context) *console.Writer {
 	if s.consoleWriter == nil {
 		s.consoleWriter = console.NewConsoleWriter()
 	}
@@ -216,7 +217,7 @@ func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
 		logConfig.LogFilePath,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
-	)
+	) // #nosec G302
 	if err != nil {
 		log.Fatalf("не удалось создать файл для логирования: %v", err)
 	}

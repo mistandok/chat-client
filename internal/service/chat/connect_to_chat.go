@@ -2,12 +2,14 @@ package chat
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/mistandok/chat-client/internal/model"
 	"github.com/mistandok/chat-client/internal/service"
 	tokenUtils "github.com/mistandok/chat-client/internal/utils/token"
-	"strconv"
 )
 
+// ConnectChat ..
 func (s *Service) ConnectChat(ctx context.Context, chatID int64) (service.StreamReader, error) {
 	tokens, userClaims, err := s.getTokensAndUserClaims(ctx)
 	if err != nil {

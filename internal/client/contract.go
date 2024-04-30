@@ -17,6 +17,7 @@ type UserClient interface {
 	Create(ctx context.Context, userForCreate model.UserForCreate) error
 }
 
+// ChatClient ..
 type ChatClient interface {
 	ConnectChat(ctx context.Context, connectChatIn model.ConnectChatIn) (StreamReader, error)
 	SendMessage(ctx context.Context, chatID int64, message model.Message) error

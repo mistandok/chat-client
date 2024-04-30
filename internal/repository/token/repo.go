@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/mistandok/chat-client/internal/repository"
 	"os"
+
+	"github.com/mistandok/chat-client/internal/repository"
 
 	"github.com/mistandok/chat-client/internal/model"
 	repoModel "github.com/mistandok/chat-client/internal/repository/token/model"

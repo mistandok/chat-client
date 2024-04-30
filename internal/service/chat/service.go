@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/mistandok/chat-client/internal/repository"
 	"github.com/rs/zerolog"
 

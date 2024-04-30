@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+
 	"github.com/mistandok/chat-client/internal/service"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
