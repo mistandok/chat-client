@@ -18,6 +18,8 @@ const (
 	loginUserDesc     = "осуществляет log-in пользователя"
 	connectToChat     = "connect-chat"
 	connectToChatDesc = "присоединение к заданному чату"
+	chat              = "chat"
+	createChatDesc    = "создает новый чат"
 )
 
 // Chat ..
@@ -30,6 +32,7 @@ type Chat struct {
 	createUserCmd    *cobra.Command
 	loginUserCmd     *cobra.Command
 	connectToChatCmd *cobra.Command
+	createChatCmd    *cobra.Command
 
 	writer ExternalWriter
 }
@@ -60,6 +63,7 @@ func (c *Chat) initCommands() {
 	c.createUserCmd = c.createCreateUserCmd()
 	c.loginUserCmd = c.createLoginUserCmd()
 	c.connectToChatCmd = c.createConnectToChatCmd()
+	c.createChatCmd = c.createCreateChatCmd()
 }
 
 func (c *Chat) createRootCmd() *cobra.Command {
@@ -82,6 +86,7 @@ func (c *Chat) combineCommand() {
 	c.rootCmd.AddCommand(c.connectToChatCmd)
 
 	c.createCmd.AddCommand(c.createUserCmd)
+	c.createCmd.AddCommand(c.createChatCmd)
 
 	c.createUserCmd.Flags().StringP("username", "u", "", "имя пользователя")
 	c.createUserCmd.Flags().StringP("email", "e", "", "email пользователя")

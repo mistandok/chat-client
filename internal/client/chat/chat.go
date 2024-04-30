@@ -49,3 +49,12 @@ func (c *Client) SendMessage(ctx context.Context, chatID int64, message model.Me
 
 	return nil
 }
+
+func (c *Client) CreateChat(ctx context.Context, userIDs []int64) (int64, error) {
+	resp, err := c.client.Create(ctx, &chat_v1.CreateRequest{UserIDs: userIDs})
+	if err != nil {
+		return 0, err
+	}
+
+	return resp.Id, nil
+}

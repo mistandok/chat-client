@@ -13,6 +13,7 @@ type ChatService interface {
 	RefreshUserTokens(ctx context.Context, refreshToken string) error
 	ConnectChat(ctx context.Context, chatID int64) (StreamReader, error)
 	SendMessage(ctx context.Context, chatID int64, text string, messageTime time.Time) error
+	CreateChat(ctx context.Context) (int64, error)
 }
 
 // StreamReader ..
